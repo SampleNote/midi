@@ -45,6 +45,8 @@ jobs:
       run: |
         python setup.py install
     - name: Run tests
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         nosetests --with-coverage --cover-package=midi
         coveralls
