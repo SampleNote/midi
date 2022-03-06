@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Upload Python Package
+name: CI
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
         uname -a
         lsb_release -a
         sudo apt -qq update
-        sudo apt install -y build-essential python-dev swig libasound2-dev
+        sudo apt install -y build-essential python3-dev swig libasound2-dev
         swig -version
     - name: Install dependencies
       run: |
