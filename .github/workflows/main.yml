@@ -1,0 +1,59 @@
+# This workflow will upload a Python Package using Twine when a release is created
+# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Upload Python Package
+
+on:
+  push:
+    branches: [ master ]
+    tags:        
+      - v1.*
+  pull_request:
+    branches: [ master ]  
+  release:
+    types: [published]
+
+jobs:
+  test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Update environment dependencies
+      shell: bash
+      run: |
+        date -u
+        uname -a
+        lsb_release -a
+        sudo apt -qq update
+        sudo apt install -y build-essential python-dev swig libasound2-dev
+        swig -version
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install coveralls
+    - name: Build library
+      run: |
+        python setup.py install
+    - name: Run tests
+      run: |
+        nosetests --with-coverage --cover-package=midi
+        coveralls
+
+#        pip install build
+#   - name: Build package
+#      run: python -m build
+#     - name: Publish package
+#       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+#       with:
+#         user: __token__
+#         password: ${{ secrets.PYPI_API_TOKEN }}
