@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+    tags:        
+      - 0.3.*
+  pull_request:
+    branches: [ master ]  
+  release:
+    types: [published]
+
+jobs:
+  test:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Update environment dependencies
+      shell: bash
+      run: |
+        date -u
+        uname -a
+        lsb_release -a
+        sudo apt -qq update
+        sudo apt install -y build-essential python3-dev swig libasound2-dev
+        swig -version
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install coveralls nose
+    - name: Build library
+      run: |
+        python setup.py install
+    - name: Run tests
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        nosetests --with-coverage --cover-package=midi
+
+  # TODO: Review how to create release version during the pipeline execution. For now it will be a manual process.
+  # release:
+  #   name: Create MIDI pckage
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v2
+  #     with:
+  #       python-version: '3.8'
+  #   - name: Update environment dependencies
+  #     shell: bash
+  #     run: |
+  #       date -u
+  #       uname -a
+  #       lsb_release -a
+  #       sudo apt -qq update
+  #       sudo apt install -y build-essential python3-dev swig libasound2-dev
+  #       swig -version
+  #   - name: Install dependencies
+  #     run: |
+  #       python -m pip install --upgrade pip
+  #       pip install build
+  #   - name: Build package
+  #     run: python -m build
